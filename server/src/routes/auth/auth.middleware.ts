@@ -14,7 +14,15 @@ const userSchema = z.object({
   country: z.string().max(40, "Country must be at most 40 characters"),
 });
 
-export const isUserAlreadyExist = async (
+const authSchema = z.object({
+  email: z
+    .string()
+    .email("Invalid email address")
+    .max(255, "Email must be at most 255 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+
+const isUserAlreadyExist = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -36,3 +44,42 @@ export const isUserAlreadyExist = async (
   req.body.hashPassword = hashPassword;
   next();
 };
+
+const loginChecker = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email, password } = req.body;
+  const result = authSchema.safeParse(req.body);
+  if (!result.success) {
+    return next({
+      status: 404,
+      message: "Please filled email and password field correctly",
+    });
+  }
+
+  const { rows } = await pool.query(
+    "select username,password,userid,passion from siteuser where email=$1",
+    [email]
+  );
+
+  if (rows.length < 1) {
+    return next({
+      status: 404,
+      message: "User doesn't exist",
+    });
+  }
+  const isCorrectPassword = await bcrypt.compare(password, rows[0].password);
+  if (!isCorrectPassword) {
+    next({
+      status: 404,
+      message: "Incorrect Password",
+    });
+  }
+  delete rows[0].password;
+  req.body.user = rows[0];
+  next();
+};
+
+export { loginChecker, isUserAlreadyExist };

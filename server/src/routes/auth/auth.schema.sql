@@ -5,4 +5,5 @@ create table siteUser(
 	password text,
 	passion varchar[],
 	country varchar(40)
+	refreshToken varchar[]
 )
