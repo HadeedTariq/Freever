@@ -6,4 +6,5 @@ create table siteUser(
 	passion varchar[],
 	country varchar(40)
 	refreshToken varchar[]
+	forget_password_key varchar(20)
 )

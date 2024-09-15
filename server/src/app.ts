@@ -16,7 +16,11 @@ const app = express();
 
 app.use(morgan("dev"));
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    exposedHeaders: ["Set-Cookie"],
+  })
+);
 app.use(express.json());
 
 app.get<{}, MessageResponse>("/", (req, res) => {
