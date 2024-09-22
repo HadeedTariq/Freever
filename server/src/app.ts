@@ -7,13 +7,14 @@ import * as middlewares from "./middlewares";
 import MessageResponse from "./interfaces/MessageResponse";
 import { authRouter } from "./routes/auth/auth.routes";
 import { connectToDb } from "./db/connectToDb";
+import cookieParser from "cookie-parser";
 
 require("dotenv").config();
 
 export const pool = connectToDb();
 
 const app = express();
-
+app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(

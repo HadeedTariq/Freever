@@ -104,4 +104,27 @@ const passwordReset = async (
   res.status(200).json({ message: "Password Reset Successfully" });
 };
 
-export { registerUser, loginUser, forgetPassword, passwordReset };
+const sellerCreation = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { experience_level, user } = req.body;
+  if (!experience_level) {
+    return next({ message: "Please fill all the fields", status: 404 });
+  }
+
+  await pool.query(
+    "insert into siteSeller (userid,experience_level) values ($1,$2)",
+    [user.userid, experience_level]
+  );
+  res.status(201).json({ message: "Seller created successfully" });
+};
+
+export {
+  registerUser,
+  loginUser,
+  forgetPassword,
+  passwordReset,
+  sellerCreation,
+};

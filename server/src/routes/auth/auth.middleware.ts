@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { pool } from "../../app";
 import { z } from "zod";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const userSchema = z.object({
   username: z.string().max(20, "Username must be at most 20 characters"),
@@ -82,4 +83,26 @@ const loginChecker = async (
   next();
 };
 
-export { loginChecker, isUserAlreadyExist };
+const authChecker = (req: Request, res: Response, next: NextFunction) => {
+  const { accessToken } = req.cookies;
+
+  if (!accessToken) {
+    return next({
+      status: 404,
+      message: "Access Token Not Found",
+    });
+  }
+
+  const user = jwt.verify(accessToken, process.env.JWT_ACCESS_TOKEN_SECRET!);
+  if (!user) {
+    return next({
+      status: 404,
+      message: "Invalid Token",
+    });
+  }
+
+  req.body.user = user;
+  next();
+};
+
+export { loginChecker, isUserAlreadyExist, authChecker };

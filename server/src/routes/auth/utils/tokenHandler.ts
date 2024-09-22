@@ -7,7 +7,7 @@ type User = {
 const refreshAccessTokenGenerator = (user: User) => {
   const accessToken = jwt.sign(user, process.env.JWT_ACCESS_TOKEN_SECRET!);
   const refreshToken = jwt.sign(
-    { id: user.userid },
+    { userid: user.userid },
     process.env.JWT_REFRESH_TOKEN_SECRET!
   );
   return { refreshToken, accessToken };
